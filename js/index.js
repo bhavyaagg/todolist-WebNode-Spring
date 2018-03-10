@@ -2,15 +2,30 @@
  * Created by bhavyaagg on 10/03/18.
  */
 
+let todos = [];
+
 $(document).ready(function () {
   let todoList = $('#todoList');
-  let newTodo = $("#newTodo");
-  let addTodo = $("#addTodo");
-  let clearTodos = $("#clearTodos");
+  let newTodoInput = $("#newTodo");
+  let addTodoBtn = $("#addTodo");
+  let clearTodosBtn = $("#clearTodos");
   
+  let savedTodos = localStorage.getItem("todos");
   
-  addTodo.click(function () {
-    let newTodoValue = newTodo.val();
+  if (savedTodos) {
+    let todos = JSON.parse(savedTodos)
+    console.log(todos);
+  }
+  
+  addTodoBtn.click(function () {
+    let newTodoValue = newTodoInput.val();
+    
+    todos.push({
+      task: newTodoValue,
+      done: false
+    });
+    
+    localStorage.setItem("todos", JSON.stringify(todos));
     
     let todoItem = $(`<li class="list-group-item"></li>`)
     
@@ -23,8 +38,6 @@ $(document).ready(function () {
     })
     
     let task = $(`<div class="col">${newTodoValue}</div>`)
-    
-    // checkBoxDiv.append(check);
     
     contentDiv.append(checkBoxDiv.append(check)).append(task)
     
