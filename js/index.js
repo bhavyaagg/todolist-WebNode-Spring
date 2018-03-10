@@ -19,13 +19,16 @@ $(document).ready(function () {
   })
   
   clearTodosBtn.click(function () {
-    let newTodos = [];
-    for (let i = 0; i < todos.length; i++) {
-      if (!todos[i].done) {
-        newTodos.push(todos[i]);
-      }
-    }
-    todos = newTodos;
+    // let newTodos = [];
+    // for (let i = 0; i < todos.length; i++) {
+    //   if (!todos[i].done) {
+    //     newTodos.push(todos[i]);
+    //   }
+    // }
+    // todos = newTodos;
+    
+    todos = todos.filter((todo) => !todo.done)
+    
     refreshTodos();
   })
   
