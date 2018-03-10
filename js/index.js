@@ -3,22 +3,30 @@
  */
 
 let todos = [];
+let todoList;
 
 $(document).ready(function () {
-  let todoList = $('#todoList');
+  todoList = $('#todoList');
   let newTodoInput = $("#newTodo");
   let addTodoBtn = $("#addTodo");
   let clearTodosBtn = $("#clearTodos");
   
-  retrieveTodos();
-  
-  for (i in todos) {
-    let todoItem = createTodoItem(+i);
-    todoList.append(todoItem);
-  }
+  refreshTodos(true)
   
   addTodoBtn.click(function () {
     addTodo(newTodoInput.val());
+    newTodoInput.val("");
+  })
+  
+  clearTodosBtn.click(function () {
+    let newTodos = [];
+    for (let i = 0; i < todos.length; i++) {
+      if (!todos[i].done) {
+        newTodos.push(todos[i]);
+      }
+    }
+    todos = newTodos;
+    refreshTodos();
   })
   
   // addTodoBtn.click(function () {
@@ -52,6 +60,33 @@ $(document).ready(function () {
   
 });
 
+function refreshTodos(firstPageLoad = false) {
+  if (!firstPageLoad) {
+    saveTodos();
+  }
+  todoList.empty();
+  retrieveTodos();
+  
+  for (i in todos) {
+    let todoItem = createTodoItem(+i);
+    todoList.append(todoItem);
+  }
+}
+
+function remove(todoId) {
+  todos.splice(todoId, 1);
+  refreshTodos();
+}
+
+function moveUp(todoId) {
+  todos.splice(todoId - 1, 0, todos.splice(todoId, 1)[0]);
+  refreshTodos();
+}
+
+function moveDown(todoId) {
+  todos.splice(todoId + 1, 0, todos.splice(todoId, 1)[0]);
+  refreshTodos();
+}
 
 function createTodoItem(i) {
   let todoItem = $(`<li class="list-group-item"></li>`)
@@ -60,17 +95,33 @@ function createTodoItem(i) {
   
   let checkBoxDiv = $(`<div class="col-2 text-center"></div>`)
   
-  let check = $(`<input type="checkbox" ${todos[i].done ? 'checked' : ''}>`).click(function () {
-    contentDiv.css("text-decoration", "line-through");
+  let check = $(`<input type="checkbox">`).click(function () {
+    todos[i].done = !todos[i].done;
+    refreshTodos();
   })
   
   if (todos[i].done) {
+    contentDiv.css("text-decoration", "line-through");
     check.prop("checked", "true");
   }
   
+  let iconUp = $(`<div class="col-sm-1"><i class="fas fa-chevron-up move-icon"></i></div>`)
+    .click(() => {
+      moveUp(i);
+    })
+  let iconDown = $(`<div class="col-sm-1"><i class="fas fa-chevron-down move-icon"></i></div>`)
+    .click(() => {
+      moveDown(i);
+    })
+  let removeButton = $(`<div class="col-sm-1"><i class="fas fa-times delete"></i></div>`)
+    .click(() => {
+      remove(i);
+    })
+  
+  
   let task = $(`<div class="col">${todos[i].task}</div>`)
   
-  contentDiv.append(checkBoxDiv.append(check)).append(task)
+  contentDiv.append(checkBoxDiv.append(check)).append(task).append(iconUp).append(iconDown).append(removeButton);
   
   todoItem.append(contentDiv)
   
@@ -93,6 +144,5 @@ function addTodo(task) {
     task: task,
     done: false
   });
-  saveTodos();
   refreshTodos();
 }
